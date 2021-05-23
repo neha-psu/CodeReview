@@ -47,8 +47,6 @@ def createTable(conn):
             trip_id integer,
             FOREIGN KEY (trip_id) REFERENCES Trip(trip_id)
             );
-
-
         """)
 
 	print(f"Created {TableName1}")

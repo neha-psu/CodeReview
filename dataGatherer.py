@@ -5,7 +5,6 @@ from urllib.request import urlopen
 from bs4 import BeautifulSoup
 
 ###### Breadcrumb DATA ######
-
 breadcrumb_url = "http://rbi.ddns.net/getBreadCrumbData"
 response = urlopen(breadcrumb_url)
 data = json.loads(response.read().decode('utf-8'))
@@ -17,35 +16,29 @@ with open(date, 'w') as file:
 ########## STOP EVENT DATA #######
 stop_event_url = "http://rbi.ddns.net/getStopEvents"
 html = urlopen(stop_event_url)
-
 soup = BeautifulSoup(html, 'lxml')
 h3 = soup.find_all('h3')
 
 trip_id_h3 =[]
-
 for i in h3:
     str_h3 = str(i)
     cleantext = BeautifulSoup(str_h3, "lxml").get_text()
-    trip_id_h3.append(cleantext)
-    
+    trip_id_h3.append(cleantext)    
+
 trip_id = []
 for i in trip_id_h3:
     x  = i.split(" ")
-    #print(x)
     trip_id_num =  int(x[4])
     trip_id.append(trip_id_num)
 
 tables = soup.find_all('table')
-#print(len(tables))
 flag = 0
 stop_event = []
-
 for table in tables:
     trip = trip_id[0]
     trip_id = trip_id[1:]
-    
     rows = table.find_all('tr')
-    #print(len(rows))
+    
     if(flag == 0):
         row_th = rows[0].find_all('th')
         str_cells = str(row_th)
@@ -56,14 +49,11 @@ for table in tables:
         row_td = row.find_all('td')
         str_cells1 = str(row_td)
         cleantext = BeautifulSoup(str_cells1, "lxml").get_text()
-        
         # create a list from cleantext
         stop_event_rows = cleantext.split(", ")
-        
         # strip "[" from first element of the list and "]" from the last element of the list
         x = stop_event_rows[0].split("[")
         stop_event_rows[0] = x[1]
-        
         size = len(stop_event_rows)
         x = stop_event_rows[size-1].split("]")
         stop_event_rows[size-1] = x[0]
@@ -94,8 +84,6 @@ for table in tables:
             data["y_coordinate"] = stop_event_rows[20]
             data["data_source"] = stop_event_rows[21] 
             data["schedule_status"] = stop_event_rows[22] 
-            
-            #trip_id = trip_id[1:]
             json_str = json.dumps(data)
             data = json.loads(json_str)
             stop_event.append(data)

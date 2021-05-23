@@ -12,12 +12,11 @@ import math
 import json 
 import csv 
 import re
-from collections import defaultdict
-from datetime import datetime, timedelta
-
 import pandas as pd
 import numpy as np
 
+from collections import defaultdict
+from datetime import datetime, timedelta
 
 def existence_assertion(df, case_num, flag = None):
     '''
@@ -99,9 +98,9 @@ def limit_assertion(df, case_num):
         elif(data>=0 and data<=359):
             pass
         else:
-            #print("--------------Invalid!! records with Wrong Direction-------------")
             df = df.drop(df.index[item])
             invalid_record_count +=1
+
     if(invalid_record_count ==0):
        print("All the records passed Case {} check!".format(case_num))
     else:
@@ -133,8 +132,6 @@ def limit_assertion(df, case_num):
         elif(data>=0 and data<=12):
             pass
         else:
-            #print(data)
-            #print("--------------Invalid!! The number of satellites for breadcrumb record should be between 0 and 12-------------")
             df =df.drop(df.index[item])
             invalid_record_count +=1
     if(invalid_record_count ==0):
@@ -143,7 +140,6 @@ def limit_assertion(df, case_num):
       print("--------------LIMIT ASSERTION VOILATION!! The number of satellites for breadcrumb record should be between 0 and 12----------")
       print("Count of invalid records: ", invalid_record_count)
 
-    
     return df, case_num
 
 def summary_assertions(df, case_num):
@@ -168,8 +164,7 @@ def summary_assertions(df, case_num):
               duplicate+=1
           else:
               unique.add(val)
-  # print("Null entries : ",nan_values)
-  # print("Invalid entries : ",duplicate)
+  
   if duplicate==0:
       print("All the records passed Case {} check!".format(case_num))
   else:
@@ -226,13 +221,9 @@ def referential_integrity(df, case_num, flag = None):
             if(pd.notnull(direction)):
                 pass
             else:
-                #print("--------------Invalid!! records with empty Direction when the speed is non-zero-------------")
-                #df = df.drop(df.index[item])
                 invalid_record_count1 +=1
         else:
             if(pd.notnull(direction)):
-                #print("--------------Invalid!! records with empty speed when the direction is non-zero-------------")
-                #df.drop(df.index[item])
                 invalid_record_count2 +=1
     if(invalid_record_count1 ==0 and invalid_record_count2 == 0):
         print("All the records passed Case {} check!".format(case_num)) 
@@ -242,7 +233,6 @@ def referential_integrity(df, case_num, flag = None):
     if(invalid_record_count2 > 0):
         print("--------------REFRENTIAL INTEGRITY ASSERTION violation!! Breadcrumb records with with empty speed when the direction is non-zero ---------")
         print("Count of invalid records: ", invalid_record_count2) 
-
 
   return df, case_num
 
@@ -299,8 +289,6 @@ def validate(bc_json_data, se_json_data):
     Breadcrumbdf.insert(0, "tstamp", timestamps)
     Breadcrumbdf.drop(columns=['OPD_DATE','ACT_TIME'],inplace=True, axis=1)
 
-    #df['DIRECTION'] = df['DIRECTION'].fillna(0)
-
     # TRANSFORMATION 5: Rename all the columns of the dataframe to match the schema
     Breadcrumbdf = Breadcrumbdf.rename(columns={"EVENT_NO_TRIP": "trip_id", "VELOCITY": "speed", "GPS_LONGITUDE": "longitude", "GPS_LATITUDE": "latitude", "DIRECTION" : "direction", "VEHICLE_ID": "vehicle_id"})
     stopdf = stopdf.rename(columns={"vehicle_number": "vehicle_id","route_number": "route_id"})
@@ -313,8 +301,6 @@ def validate(bc_json_data, se_json_data):
     Breadcrumbdf['direction'] = Breadcrumbdf['direction'].astype(float).astype('Int32')
     Breadcrumbdf['latitude'] = Breadcrumbdf['latitude'].astype(float)
     Breadcrumbdf['longitude'] = Breadcrumbdf['longitude'].astype(float)
-    
-    
     Breadcrumbdf['speed'] = Breadcrumbdf['speed']*2.23694 # change speed from m/s to miles/hr
     
     case_num = 0
@@ -339,15 +325,7 @@ def validate(bc_json_data, se_json_data):
     tripdf["direction"] = 'Out'
     tripdf["service_key"] = 'Weekday'
     tripdf["route_id"] = np.nan
-    #tripdf["direction"] = tripdf["direction"].astype('Int32')
-    #tripdf["service_key"] = tripdf["service_key"].astype(str)
     tripdf["route_id"] = tripdf["route_id"].astype('Int32')
-
-    # print(Breadcrumbdf.dtypes)
-    #print("\n",Breadcrumbdf.head())
-
-    # print("\n Trip:", tripdf.dtypes)
-    #print("\n",tripdf.head())
 
     # TRANSFORMATION 4 : Change the value of direction to out and back if its 0 and 1 respectively
     for index in range(len(stopdf['direction'])):
@@ -372,7 +350,6 @@ def validate(bc_json_data, se_json_data):
     tripdf, case_num = existence_assertion(tripdf, case_num, flag = 0) # assertions 1 & 2 & 3
     tripdf, case_num = referential_integrity(tripdf, case_num, flag = 0) # assertion 9
     
-    #print("\n=====================VALIDATIONS================================")
     print("\n=====================For each trip id, we have a single route no, service key and direction============")
     groupby_trip = stopdf.groupby('trip_id')
     groups = groupby_trip.groups.keys()
@@ -388,7 +365,6 @@ def validate(bc_json_data, se_json_data):
     finaldf = finaldf.drop_duplicates()
     newdf=tripdf.merge(stopdf, on=['trip_id','vehicle_id'], how='left')
     newdf = newdf.drop(newdf.columns[[2, 3, 4]], axis=1) 
-    #print(newdf)
     
     # CONVERT THE DATAFRAMES INTO CSVs
     Breadcrumbdf.to_csv('Breadcrumbdf.csv',index=False, header=False,na_rep='None')
