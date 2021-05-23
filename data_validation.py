@@ -60,7 +60,8 @@ def existence_assertion(df, case_num, flag = None):
             df = df.drop_duplicates()
 
         elif (invalid_record_count > 0 and output == True):
-            print("--------------EXISTENCE ASSERTION VOILATION!! trip ID should not be NOT NULL value----------")
+            print("--------------EXISTENCE ASSERTION VOILATION!! trip ID should not be",\
+                "NOT NULL value----------")
             print("Count of invalid records: ", invalid_record_count)
 
         else:
@@ -80,7 +81,7 @@ def existence_assertion(df, case_num, flag = None):
         else:
             print("--------------EXISTENCE ASSERTION VOILATION!! Every Breadcrumb record should have a non empty tstamp field----------")
             print("Count of invalid records: ", invalid_record_count)
-
+            print("Irritating merge conflicts")
     return df, case_num
 
 def limit_assertion(df, case_num):
