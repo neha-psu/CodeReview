@@ -30,9 +30,9 @@ from confluent_kafka import Producer, KafkaError
 import ccloud_lib
 import urllib.request
 
+
 def produce_breadcrumb_records():
     pass
-
 
 if __name__ == '__main__':
 
@@ -62,6 +62,7 @@ if __name__ == '__main__':
     stopEvent_path = '/home/agrawal/examples/clients/cloud/python/stop_event/2021-02-05.json'
     with open(stopEvent_path) as file:
         stopEvent_data = json.load(file)
+   # data = json.loads(response.read().decode('utf-8'))
 
     # Optional per-message on_delivery handler (triggered by poll() or flush())
     # when a message has been successfully delivered or
@@ -94,4 +95,5 @@ if __name__ == '__main__':
         producer.poll(0)
         
     producer.flush()
+
     print("{} messages were produced to topic {}!".format(delivered_records, topic))

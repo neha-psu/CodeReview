@@ -32,6 +32,7 @@ from data_validation import *
 from data_load import *
 
 
+
 if __name__ == '__main__':
 
     # Read arguments and configurations and initialize
@@ -77,8 +78,10 @@ if __name__ == '__main__':
                     flag = 1
                 else:
                     print("Waiting for message or event/error in poll()")
-                
+                #print(time.time(), start, start + timeout)
                 if time.time() > start + timeout:
+                    #print("Hi")
+                    #print(time.time(), start)
                     break
                 else:
                     continue
@@ -92,12 +95,14 @@ if __name__ == '__main__':
                     data = json.loads(record_value)
                     breadcrumb_list.append(data)
                     total_count += 1
-                    
+                    #print("Consumed record with value {}.format(data))
                 if record_key == "stop_event":
                     record_value = msg.value().decode('utf-8')
                     data = json.loads(record_value)
                     stopevent_list.append(data)
                     total_count += 1
+                    #print("Consumed record with value {}.format(data))
+
     except KeyboardInterrupt:
         pass
     finally:
@@ -105,6 +110,7 @@ if __name__ == '__main__':
             bc_json_data = json.dumps(breadcrumb_list, indent=4)
             se_json_data = json.dumps(stopevent_list, indent=4)
             validate(bc_json_data, se_json_data)
+            #postgres()
         
         # Leave group and commit final offsets
         consumer.close()
