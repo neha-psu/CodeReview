@@ -37,8 +37,14 @@ def query1(conn):
     """
     cur = conn.cursor()
     cur.execute("DROP view IF EXISTS i205")
-    cur.execute("Create view i205 as Select t.trip_id from breadcrumb b, trip t where b.trip_id=t.trip_id and latitude > 45.586158 and latitude < 45.592404  and longitude>-122.550711 and longitude<-122.541270 and t.trip_id = 170031016  and route_id = 164 and date(tstamp) = '2020-10-09'")
-    cur.execute("Select b.speed, b.latitude, b.longitude,b.tstamp::time as time from breadcrumb b,trip t, i205 as i where b.trip_id=t.trip_id and t.trip_id = i.trip_id and t.route_id = 164 and tstamp::time between time '08:00:00' and '10:00:00' and date(tstamp) = '2020-10-09'")
+    cur.execute("Create view i205 as Select t.trip_id from breadcrumb b, trip t where \
+    b.trip_id=t.trip_id and latitude > 45.586158 and latitude < 45.592404  and \
+    longitude>-122.550711 and longitude<-122.541270 and t.trip_id = 170031016  and \
+    route_id = 164 and date(tstamp) = '2020-10-09'")
+    cur.execute("Select b.speed, b.latitude, b.longitude,b.tstamp::time as time from \
+    breadcrumb b,trip t, i205 as i where b.trip_id=t.trip_id and t.trip_id = i.trip_id \
+    and t.route_id = 164 and tstamp::time between time '08:00:00' and '10:00:00' and \
+    date(tstamp) = '2020-10-09'")
     rows = cur.fetchall()
     print("The row count for query 1: ", cur.rowcount)
     features = []
@@ -75,7 +81,9 @@ def query2(conn):
     cur = conn.cursor()
     cur.execute("DROP view IF EXISTS DAYS")
     cur.execute("create view  DAYS as select *,extract(isodow from TSTAMP) from breadcrumb")
-    cur.execute("select t.trip_id,b.speed, b.latitude, b.longitude from  trip t, DAYS b where t.trip_id=b.trip_id and t.direction='Out' and t.route_id=65 and date_part=5 and date(tstamp) = '2020-10-09' and tstamp::time between time '16:00:00' and '18:00:00'")
+    cur.execute("select t.trip_id,b.speed, b.latitude, b.longitude from  trip t, DAYS b where \
+    t.trip_id=b.trip_id and t.direction='Out' and t.route_id=65 and date_part=5 and \
+    date(tstamp) = '2020-10-09' and tstamp::time between time '16:00:00' and '18:00:00'")
     rows = cur.fetchall()
     print("The row count for query 2: ", cur.rowcount)
     features = []
@@ -110,7 +118,10 @@ def query3(conn):
 
     """
     cur = conn.cursor()
-    cur.execute("select t.trip_id,b.speed, b.latitude, b.longitude from  trip t,breadcrumb b where t.trip_id=b.trip_id and t.direction = 'Out' and service_key='Sunday' and date(tstamp) = '2020-10-11' and route_id=65 and tstamp::time between time '09:00:00' and '11:00:00'") 
+    cur.execute("select t.trip_id,b.speed, b.latitude, b.longitude from  trip t,breadcrumb b \
+    where t.trip_id=b.trip_id and t.direction = 'Out' and service_key='Sunday' and \
+    date(tstamp) = '2020-10-11' and route_id=65 and tstamp::time between time '09:00:00' \
+    and '11:00:00'") 
     rows = cur.fetchall()
     print("The row count for query 3: ", cur.rowcount)
     features = []
@@ -145,8 +156,11 @@ def query4(conn):
     """
     cur = conn.cursor()
     cur.execute("DROP view IF EXISTS longest")
-    cur.execute("Create view longest as select age(max(b.tstamp), min(b.tstamp)) as time, b.trip_id, DATE(tstamp), t.route_id from breadcrumb b, trip t where b.trip_id=t.trip_id group by b.trip_id, date(tstamp), t.route_id order by time desc limit 1")
-    cur.execute("Select speed, latitude, longitude from breadcrumb b, longest l where b.trip_id=l.trip_id")
+    cur.execute("Create view longest as select age(max(b.tstamp), min(b.tstamp)) as time, \
+    b.trip_id, DATE(tstamp), t.route_id from breadcrumb b, trip t where b.trip_id=t.trip_id \
+    group by b.trip_id, date(tstamp), t.route_id order by time desc limit 1")
+    cur.execute("Select speed, latitude, longitude from breadcrumb b, longest l where \
+    b.trip_id=l.trip_id")
     
     rows = cur.fetchall()
     print("The row count for query 4: ", cur.rowcount)
@@ -177,11 +191,16 @@ def query4(conn):
 
 def query5a(conn):
     """
-    Speeds for all return onward trips in the I-5 Bridge between 6 PM and 8 PM on Sunday October 11, 2020
+    Speeds for all return onward trips in the I-5 Bridge between 6 PM and 8 PM 
+    on Sunday October 11, 2020
     """
 
     cur = conn.cursor()
-    cur.execute("Select t.trip_id, speed, latitude, longitude, tstamp::time as time from breadcrumb b,trip t where b.trip_id=t.trip_id and latitude> 45.615477 and latitude < 45.620460 and longitude>-122.677744 and longitude<-122.673624 and DATE(tstamp) = '2020-10-11' and tstamp::time between time '18:00:00' and '20:00:00' and t.direction='Back'")
+    cur.execute("Select t.trip_id, speed, latitude, longitude, tstamp::time as time from \
+    breadcrumb b,trip t where b.trip_id=t.trip_id and latitude> 45.615477 and \
+    latitude < 45.620460 and longitude>-122.677744 and longitude<-122.673624 and \
+    DATE(tstamp) = '2020-10-11' and tstamp::time between time '18:00:00' and '20:00:00' \
+    and t.direction='Back'")
     rows = cur.fetchall()
     print("The row count for query 5: ", cur.rowcount)
     features = []
@@ -213,11 +232,14 @@ def query5a(conn):
 
 def query5b(conn):
     """
-    Visualize the CTRAN buses travelling with the speed above 55 miles/hr on route 71 on October 12, 2020.
+    Visualize the CTRAN buses travelling with the speed above 55 miles/hr 
+    on route 71 on October 12, 2020.
     """
 
     cur = conn.cursor()
-    cur.execute("Select t.trip_id, b.speed, b.latitude, b.longitude, date(tstamp) as tstamp from breadcrumb b, trip t where b.trip_id = t.trip_id and speed > 55 and route_id = 71 and date(tstamp) = '2020-10-12'")
+    cur.execute("Select t.trip_id, b.speed, b.latitude, b.longitude, date(tstamp) as tstamp \
+    from breadcrumb b, trip t where b.trip_id = t.trip_id and speed > 55 and route_id = 71 \
+    and date(tstamp) = '2020-10-12'")
     rows = cur.fetchall()
     print("The row count for query 5b: ", cur.rowcount)
     features = []
@@ -256,8 +278,13 @@ def query5c(conn):
 
     cur = conn.cursor()  
     cur.execute("DROP VIEW IF EXISTS busy_route")
-    cur.execute("create view busy_route as select count(*) as count, route_id from breadcrumb b, trip t where t.trip_id =b.trip_id and route_id IS NOT NULL and tstamp::time between time '06:00:00' and '08:00:00' and date(tstamp) = '2020-10-14' group by route_id order by count desc limit 1")
-    cur.execute("select b.trip_id, speed, latitude, longitude from breadcrumb b, trip t, busy_route r where b.trip_id =t.trip_id and t.route_id = r.route_id and date(tstamp) = '2020-10-14' and tstamp::time between time '06:00:00' and '08:00:00'")
+    cur.execute("create view busy_route as select count(*) as count, route_id from breadcrumb b, \
+    trip t where t.trip_id =b.trip_id and route_id IS NOT NULL and tstamp::time between \
+    time '06:00:00' and '08:00:00' and date(tstamp) = '2020-10-14' group by route_id \
+    order by count desc limit 1")
+    cur.execute("select b.trip_id, speed, latitude, longitude from breadcrumb b, trip t, \
+    busy_route r where b.trip_id =t.trip_id and t.route_id = r.route_id and \
+    date(tstamp) = '2020-10-14' and tstamp::time between time '06:00:00' and '08:00:00'")
     rows = cur.fetchall()
     print("The row count for query 5c: ", cur.rowcount)
     features = []
@@ -294,7 +321,8 @@ def query5d(conn):
     """
 
     cur = conn.cursor()
-    time_frame = [['06:00:00','08:00:00'], ['08:00:01', '10:00:00'],['16:00:00','18:00:00'],['18:00:01','20:00:00']]
+    time_frame = [['06:00:00','08:00:00'], ['08:00:01', '10:00:00'],['16:00:00','18:00:00'] \
+    ,['18:00:01','20:00:00']]
     count = []
     for time in time_frame:
         cur = conn.cursor()
