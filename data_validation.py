@@ -44,7 +44,7 @@ def existence_assertion(df, case_num, flag = None):
 
         case_num = case_num + 2
         print("\n----- CASE {} & {}: Every record of Trip table  should have",\
-            " a unique and not NULL trip id")
+            " a unique  trip id")
         invalid_record_count = 0 
         output = pd.Series(df['trip_id']).is_unique
         for item, data in enumerate(df['trip_id']):
