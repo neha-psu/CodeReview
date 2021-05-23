@@ -61,7 +61,7 @@ def existence_assertion(df, case_num, flag = None):
 
         elif (invalid_record_count > 0 and output == True):
             print("--------------EXISTENCE ASSERTION VOILATION!! trip ID should not be",\
-                "NOT NULL value----------")
+                "value----------")
             print("Count of invalid records: ", invalid_record_count)
 
         else:
